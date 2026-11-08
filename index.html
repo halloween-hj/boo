@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="ko"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>🎃 HJ's Halloween</title>
+<link href="https://fonts.googleapis.com/css2?family=Jua&family=Press+Start+2P&display=swap" rel="stylesheet">
+<style>
+:root{color-scheme:dark;--bg:#1a0f2e;--bg2:#2a1a4a;--or:#ff8a1f;--pu:#9b5de5;--tx:#fff3e0}
+*{box-sizing:border-box}
+html,body{height:100%;margin:0}
+body{background:var(--bg);color:var(--tx);font-family:Jua,sans-serif;display:flex;align-items:center;justify-content:center;overflow:hidden;padding:env(safe-area-inset-top,0) 16px env(safe-area-inset-bottom,0)}
+#stars{position:fixed;inset:0;width:100%;height:100%;image-rendering:pixelated;z-index:0}
+.wrap{position:relative;z-index:1;width:100%;max-width:400px;text-align:center}
+h1{font-family:'Press Start 2P',Jua,monospace;font-size:15px;line-height:1.7;color:var(--or);text-shadow:3px 3px 0 #000;margin:0 0 6px}
+.sub{font-size:16px;opacity:.85;margin:0 0 22px}
+.box{background:var(--bg2);border:4px solid var(--pu);padding:20px 16px;box-shadow:6px 6px 0 #000}
+.dots{display:flex;justify-content:center;gap:12px;margin:4px 0 16px}
+.dots i{width:18px;height:18px;border:3px solid var(--tx);background:transparent;display:block}
+.dots i.f{background:var(--or);border-color:var(--or)}
+.pad{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.pad button,.btn{font-family:Jua,sans-serif;font-size:22px;color:var(--tx);background:#3b2569;border:3px solid var(--pu);border-bottom-width:6px;padding:10px 0;cursor:pointer;border-radius:2px;-webkit-tap-highlight-color:transparent}
+.pad button:active{transform:translateY(3px);border-bottom-width:3px}
+.msg{min-height:22px;margin:12px 0 0;font-size:15px;color:#ff8a9b}
+.shake{animation:sh .4s}
+@keyframes sh{20%{transform:translateX(-8px)}40%{transform:translateX(8px)}60%{transform:translateX(-6px)}80%{transform:translateX(6px)}}
+.hide{display:none!important}
+.vcard{display:block;width:100%;text-align:left;background:#3b2569;color:var(--tx);border:3px solid var(--pu);border-bottom-width:6px;padding:14px 14px;margin:0 0 14px;text-decoration:none;border-radius:2px;position:relative}
+.vcard:active{transform:translateY(3px);border-bottom-width:3px}
+.vcard b{display:block;font-size:20px;color:var(--or);margin-bottom:4px}
+.vcard span{font-size:15px;opacity:.9}
+.vcard em{position:absolute;right:10px;top:10px;font-style:normal;font-family:'Press Start 2P',monospace;font-size:9px;background:var(--or);color:#000;padding:4px 6px}
+.out{margin-top:6px;background:none;border:none;color:var(--tx);opacity:.6;font-family:Jua,sans-serif;font-size:14px;cursor:pointer;text-decoration:underline}
+</style></head><body>
+<canvas id="stars"></canvas>
+<div class="wrap">
+ <div id="login">
+  <h1>HJ'S<br>HALLOWEEN 🎃</h1>
+  <p class="sub">비밀번호를 입력해줘요</p>
+  <div class="box" id="lbox">
+   <div class="dots" id="dots"><i></i><i></i><i></i><i></i></div>
+   <div class="pad" id="pad"></div>
+   <p class="msg" id="msg"></p>
+  </div>
+ </div>
+ <div id="pick" class="hide">
+  <h1>SELECT<br>VERSION</h1>
+  <p class="sub">플레이할 버전을 골라줘요</p>
+  <a class="vcard" href="v1/index.html"><b>🍸 Ver. 1 — 원본</b><span>처음 만든 칵테일 바 게임</span></a>
+  <a class="vcard" href="v2/index.html"><em>NEW</em><b>🎃 Ver. 2 — 업데이트</b><span>새로 업데이트된 버전</span></a>
+  <button class="out" onclick="logout()">잠그기</button>
+ </div>
+</div>
+<script>
+/* 비밀번호는 평문이 아니라 SHA-256 해시로만 들어 있어요 */
+var SALT="HJ-halloween:",HASH="92b85aae04fee1b70a5c8baadc940ffe6d9430dbe6548b1a425ddac67c25461a";
+var buf="",busy=0;
+function $(s){return document.querySelector(s)}
+function show(ok){$('#login').classList.toggle('hide',ok);$('#pick').classList.toggle('hide',!ok)}
+function paint(){[].forEach.call($('#dots').children,function(d,i){d.classList.toggle('f',i<buf.length)})}
+function sha(s){var b=new TextEncoder().encode(s);return crypto.subtle.digest('SHA-256',b).then(function(h){return Array.prototype.map.call(new Uint8Array(h),function(x){return('0'+x.toString(16)).slice(-2)}).join('')})}
+function press(k){if(busy)return;$('#msg').textContent='';
+ if(k=='←'){buf=buf.slice(0,-1);paint();return}
+ if(buf.length>=4)return;buf+=k;paint();
+ if(buf.length==4){busy=1;
+  var done=function(ok){if(ok){try{sessionStorage.setItem('hj_ok','1')}catch(e){}show(true)}else{$('#msg').textContent='비밀번호가 달라요 🥲';var b=$('#lbox');b.classList.remove('shake');void b.offsetWidth;b.classList.add('shake')}buf='';paint();busy=0};
+  try{sha(SALT+buf).then(function(h){done(h===HASH)},function(){busy=0;$('#msg').textContent='https 주소로 열어줘요'})}catch(e){busy=0;$('#msg').textContent='https 주소로 열어줘요'}}}
+['1','2','3','4','5','6','7','8','9','','0','←'].forEach(function(k){var b=document.createElement('button');b.textContent=k;if(!k)b.style.visibility='hidden';else b.onclick=function(){press(k)};$('#pad').appendChild(b)});
+document.addEventListener('keydown',function(e){if(!$('#login').classList.contains('hide')){if(/^[0-9]$/.test(e.key))press(e.key);else if(e.key=='Backspace')press('←')}});
+function logout(){try{sessionStorage.removeItem('hj_ok')}catch(e){}buf='';paint();show(false)}
+try{if(sessionStorage.getItem('hj_ok')=='1')show(true)}catch(e){}
+/* pixel starry background */
+(function(){var c=$('#stars'),x=c.getContext('2d'),W=90,H=Math.round(90*innerHeight/innerWidth),S=[];c.width=W;c.height=H;for(var i=0;i<45;i++)S.push([Math.random()*W|0,Math.random()*H|0,Math.random()*4]);
+ (function f(t){x.fillStyle='#1a0f2e';x.fillRect(0,0,W,H);S.forEach(function(s){x.fillStyle=(Math.floor(t/500+s[2])%2)?'#6b52a8':'#2f2155';x.fillRect(s[0],s[1],1,1)});requestAnimationFrame(f)})(0)})();
+</script></body></html>
