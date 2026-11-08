@@ -401,8 +401,8 @@ function pxText(lines,fs,lh,w,col){
 function fwStart(){
  document.querySelectorAll('.ghost').forEach(function(g){g.remove()});$('#gc').style.display='none';
  var c=$('#fw'),W=120,r=c.getBoundingClientRect(),H=Math.max(160,Math.round(W*r.height/r.width));c.width=W;c.height=H;
- var x=c.getContext('2d'),P=[['#ff9ec7','#ff6b9d'],['#ffd23f','#ff8a1f'],['#b388ff','#9b5de5'],['#7be0ff','#3a86ff'],['#9be564','#4caf50'],['#ff6b6b','#e63946']];
- var tx=pxText(['하정언니','정말','생일 축하해'],15,19,W,[255,243,224]),sh=pxText(['하정언니','정말','생일 축하해'],15,19,W,[255,107,157]);
+ var x=c.getContext('2d'),P=[['#ff9ec7','#ff6b9d'],['#ffd23f','rgb(255, 138, 31)'],['#b388ff','#9b5de5'],['#7be0ff','#3a86ff'],['#9be564','#4caf50'],['#ff6b6b','#e63946']];
+ var tx=pxText(['하정언니','생일 축하해'],15,19,W,[255,243,224]),sh=pxText(['하정언니','생일 축하해'],15,19,W,[255,107,157]);
  var heart=['0110110','1111111','1111111','0111110','0011100','0001000'],hy=0;
  var rk=[],pt=[],last=0,t0=performance.now();FW.run=1;
  var stars=[];for(var i=0;i<30;i++)stars.push([Math.random()*W,Math.random()*H*.7,Math.random()*3]);
